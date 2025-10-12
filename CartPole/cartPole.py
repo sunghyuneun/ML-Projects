@@ -11,10 +11,10 @@ terminated = False
 truncated = False
 
 #Position, Velocity, Angle, Angular Velocity Bins
-POS_BINS = np.linspace(-4.8,4.8,5)
-VEL_BINS = np.linspace(-3.5,3.5,5)
-ANG_BINS = np.linspace(-.418,.418,5)
-ANG_VEL_BINS = np.linspace(-5.0,5.0,5)
+POS_BINS = np.linspace(-4.8,4.8,9)
+VEL_BINS = np.linspace(-3.5,3.5,9)
+ANG_BINS = np.linspace(-.418,.418,9)
+ANG_VEL_BINS = np.linspace(-5.0,5.0,9)
 
 #Initialize Q Table, Q_table[discrete_state,action] is Q(s,a)
 Q_table = defaultdict(lambda: np.zeros(env.action_space.n))
@@ -111,22 +111,24 @@ env.close()
 
 last_env = gymnasium.make('CartPole-v1',render_mode = 'human')
 
-first_state, _ = last_env.reset()
-current_discrete_state = discretize_state(first_state)
-done = False
 total_reward = 0
+while total_reward < 150:
+    first_state, _ = last_env.reset()
+    current_discrete_state = discretize_state(first_state)
+    done = False
+    total_reward = 0
 
-while not done:
-    action = select_action(current_discrete_state, Q_table, 0)
+    while not done:
+        action = select_action(current_discrete_state, Q_table, 0)
 
-    state, reward, terminated, truncated, info = last_env.step(action)
-    done = terminated or truncated
+        state, reward, terminated, truncated, info = last_env.step(action)
+        done = terminated or truncated
 
-    new_discrete_state = discretize_state(state)
+        new_discrete_state = discretize_state(state)
 
-    current_discrete_state = new_discrete_state
-    total_reward += reward
-    last_env.render()
+        current_discrete_state = new_discrete_state
+        total_reward += reward
+        last_env.render()
 
 print(f"\nFinished training. Total Reward: {total_reward}")
 
