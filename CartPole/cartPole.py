@@ -5,6 +5,7 @@ import random
 
 env = gymnasium.make('CartPole-v1')
 
+#? Maybe Delete
 observation, info = env.reset(seed=42)
 terminated = False
 truncated = False
@@ -31,7 +32,7 @@ DISCOUNT_RATE = .99
 #print(f"Observation Space: {env.observation_space}")
 #print(f"Action Space (0=Left, 1=Right): {env.action_space}")
 
-MAX_EPISODES = 100000
+MAX_EPISODES = 50000
 
 #Discretizes the state based on the (global) bins
 def discretize_state(state):
@@ -51,7 +52,6 @@ def select_action(discrete_state, Q_table, epsilon):
     #If below epsilon, do random
     if random.random() < epsilon:
         return env.action_space.sample()
-    
     #Otherwise, return the action that provided maximum value at a state. 
     else:
         return np.argmax(Q_table[discrete_state])
@@ -70,34 +70,44 @@ def update_q_table(s, a, r, s_prime, done, Q_table):
     td_target = r + DISCOUNT_RATE * max_future_q
 
     #TD Error:
+
     td_error = td_target - Q_table[s][a]
     
     Q_table[s][a] += ALPHA * td_error
 
-
+reached_truncate = False
 
 #Training Episodes
-for episode in range(1, MAX_EPISODES):
-    first_state, _ = env.reset(seed=random.randint(0, 10000000) if episode == 1 else None)
+for episode in range(1, MAX_EPISODES+1):
+    first_state, _ = env.reset()
     current_discrete_state = discretize_state(first_state)
     done = False
+    score = 0
 
     while not done:
         action = select_action(current_discrete_state, Q_table, epsilon)
 
         state, reward, terminated, truncated, info = env.step(action)
+        if truncated:
+            if not reached_truncate:
+                print("First Truncation")
+                reached_truncate = True
+
         done = terminated or truncated
 
         new_discrete_state = discretize_state(state)
 
-        old_q_value = Q_table[current_discrete_state][action]
         update_q_table(current_discrete_state, action, reward, new_discrete_state, done, Q_table)
 
         current_discrete_state = new_discrete_state
+        score += reward
         
     epsilon = max(MIN_EPSILON, epsilon * EPSILON_DECAY_RATE)
+    if episode % 5000 == 0:
+        print(f"Episode: {episode}, Score: {score}")
 
 env.close()
+
 
 last_env = gymnasium.make('CartPole-v1',render_mode = 'human')
 
@@ -109,7 +119,7 @@ total_reward = 0
 while not done:
     action = select_action(current_discrete_state, Q_table, 0)
 
-    state, reward, terminated, truncated, info = env.step(action)
+    state, reward, terminated, truncated, info = last_env.step(action)
     done = terminated or truncated
 
     new_discrete_state = discretize_state(state)
@@ -118,6 +128,6 @@ while not done:
     total_reward += reward
     last_env.render()
 
-print(f"\nEpisode finished. Total Reward: {total_reward}")
+print(f"\nFinished training. Total Reward: {total_reward}")
 
 last_env.close()
