@@ -11,10 +11,10 @@ terminated = False
 truncated = False
 
 #Position, Velocity, Angle, Angular Velocity Bins
-POS_BINS = np.linspace(-4.8,4.8,9)
-VEL_BINS = np.linspace(-3.5,3.5,9)
-ANG_BINS = np.linspace(-.418,.418,9)
-ANG_VEL_BINS = np.linspace(-5.0,5.0,9)
+POS_BINS = np.linspace(-4.8,4.8,15)
+VEL_BINS = np.linspace(-3.5,3.5,15)
+ANG_BINS = np.linspace(-.418,.418,15)
+ANG_VEL_BINS = np.linspace(-5.0,5.0,15)
 
 #Initialize Q Table, Q_table[discrete_state,action] is Q(s,a)
 Q_table = defaultdict(lambda: np.zeros(env.action_space.n))

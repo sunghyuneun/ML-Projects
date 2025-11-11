@@ -1,4 +1,4 @@
-k = 382
-n = 13
-a,b = divmod(k,n)
-print(a,b)
+import numpy as np
+
+a = np.array([[1,2,3],[4,5,6]])
+print(a.shape)
