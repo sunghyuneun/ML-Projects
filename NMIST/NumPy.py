@@ -1,5 +1,17 @@
 # https://www.kaggle.com/code/sunghyuneun/numpy-mnist
 # Thanks Samson Zhang u the goat lowkey makes a lot more sense after doing this
+# None of this code is runnable unless you run it on ran it in Kaggle link
+
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+from matplotlib import pyplot as plt
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+data = pd.read_csv('/kaggle/input/digit-recognizer/train.csv')
 
 data = np.array(data) #Converts (pandas) dataset into numpy array
 m,n = data.shape #Extracts rows (m) and columns (n)
@@ -51,6 +63,16 @@ def one_hot(Y): #one-hot encoding; converting categorical data to a numerical fo
     one_hot_Y[np.arange(Y.size), Y] = 1 #np.arange generates indices for the row, Y is the column index (actual digit). Sets element at row index, column index to 1.
     one_hot_Y = one_hot_Y.T
     return one_hot_Y
+
+def backward_prop(Z1, A1, Z2, A2, W1, W2, X, Y):
+    one_hot_Y = one_hot(Y)
+    dZ2 = A2 - one_hot_Y
+    dW2 = 1 / m * dZ2.dot(A1.T)
+    db2 = 1 / m * np.sum(dZ2)
+    dZ1 = W2.T.dot(dZ2) * ReLU_prime(Z1)
+    dW1 = 1 / m * dZ1.dot(X.T)
+    db1 = 1 / m * np.sum(dZ1)
+    return dW1, db1, dW2, db2
 
 def param_update(W1, b1, W2, b2, alpha, dW1, db1, dW2, db2):
     W1 -= alpha * dW1 #Parameter update, see equations above.
