@@ -4,7 +4,7 @@ from stable_baselines3 import PPO
 env = gym.make("HalfCheetah-v5", render_mode = "human")
 
 try:
-    model = PPO.load("halfcheetah_ppo_v5", env=env)
+    model = PPO.load("halfcheetah_ppo_modified_reward", env=env)
 except FileNotFoundError:
     print("lol file is not here bro")
     exit()
